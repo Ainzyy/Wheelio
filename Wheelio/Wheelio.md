@@ -378,3 +378,17 @@ float getDistanceFromLidar() { return 2.0; }
 ## Credentials
 
 ### Firebase Account
+wheelioooh@gmail.com
+wheelioGroup?!
+
+THRESHOLD
+WHEELIO THRESHOLD
+1. Gyro
+- Y: 9 degrees
+- X: 60 degrees
+2. Acceleration
+- 2 m/s^2
+3. Distance
+- <2 meter or <200 cm
+4. Grove light
+- 1000 lumens

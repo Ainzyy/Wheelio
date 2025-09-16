@@ -10,7 +10,7 @@ constexpr int PIN_MPU6050_SDA = 21;
 constexpr int PIN_MPU6050_SCL = 22;
 
 // Light sensor configuration
-constexpr int LIGHT_SENSOR_THRESHOLD = 200; // Adjust as needed
+constexpr int LIGHT_SENSOR_THRESHOLD = 1000; // Adjust as needed
 constexpr unsigned long LIGHT_SENSOR_PERSIST_TIME = 2000; // ms
 
 // Complementary filter configuration

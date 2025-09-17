@@ -11,11 +11,11 @@ void actuatorsInit() {
 }
 
 void setFogLight(bool on) {
-  digitalWrite(PIN_RELAY_FOG, on ? HIGH : LOW);
+  digitalWrite(PIN_RELAY_FOG, on ? LOW : HIGH);
 }
 
 void setWarningLight(bool on) {
-  digitalWrite(PIN_RELAY_WARN, on ? HIGH : LOW);
+  digitalWrite(PIN_RELAY_WARN, on ? LOW : HIGH);
 }
 
 void setBuzzer(bool on) {

@@ -482,22 +482,22 @@
         let currentMode = 'scenarios'; // 'scenarios' or 'random'
         let scenarioIndex = 0;
 
-        // Test scenarios (same as Python version)
+        // Test scenarios (lidar values in centimeters to match Firebase data)
         const testScenarios = [
             // Normal operation
-            { tilt_side: 5.0, tilt_fb: 2.0, lidar: 3.0, light: 1500, accel_x: 1.2 },
+            { tilt_side: 5.0, tilt_fb: 2.0, lidar: 300, light: 1500, accel_x: 1.2 },
             // Side tilt warning
-            { tilt_side: 35.0, tilt_fb: 3.0, lidar: 2.5, light: 1200, accel_x: 2.1 },
+            { tilt_side: 35.0, tilt_fb: 3.0, lidar: 250, light: 1200, accel_x: 2.1 },
             // Pitch tilt warning
-            { tilt_side: 8.0, tilt_fb: 12.0, lidar: 2.0, light: 1100, accel_x: 3.5 },
+            { tilt_side: 8.0, tilt_fb: 12.0, lidar: 200, light: 1100, accel_x: 3.5 },
             // Obstacle warning
-            { tilt_side: 5.0, tilt_fb: 3.0, lidar: 1.2, light: 1300, accel_x: 0.8 },
+            { tilt_side: 5.0, tilt_fb: 3.0, lidar: 120, light: 1300, accel_x: 0.8 },
             // Low light (fog light)
-            { tilt_side: 2.0, tilt_fb: 1.0, lidar: 2.8, light: 800, accel_x: 1.0 },
+            { tilt_side: 2.0, tilt_fb: 1.0, lidar: 280, light: 800, accel_x: 1.0 },
             // High acceleration warning
-            { tilt_side: 5.0, tilt_fb: 3.0, lidar: 2.5, light: 1200, accel_x: 3.5 },
+            { tilt_side: 5.0, tilt_fb: 3.0, lidar: 250, light: 1200, accel_x: 3.5 },
             // Multiple warnings
-            { tilt_side: 40.0, tilt_fb: 11.0, lidar: 1.0, light: 500, accel_x: 8.5 }
+            { tilt_side: 40.0, tilt_fb: 11.0, lidar: 100, light: 500, accel_x: 8.5 }
         ];
 
         // Generate random sensor data
@@ -505,7 +505,7 @@
             return {
                 tilt_side: (Math.random() - 0.5) * 90,  // -45 to +45 degrees
                 tilt_fb: (Math.random() - 0.5) * 30,    // -15 to +15 degrees
-                lidar: Math.random() * 4.5 + 0.5,       // 0.5 to 5.0 meters
+                lidar: Math.random() * 450 + 50,        // 50 to 500 centimeters
                 light: Math.random() * 2000,             // 0 to 2000 lux
                 accel_x: (Math.random() - 0.5) * 20     // -10 to +10 m/s²
             };
@@ -539,8 +539,8 @@
                 warnings.push("High acceleration warning");
             }
 
-            // Check lidar distance
-            if (sensorData.lidar <= 1.50) {
+            // Check lidar distance (convert from cm to meters for comparison)
+            if (sensorData.lidar <= 150) {  // 150 cm = 1.50 meters
                 warning_light = true;
                 warnings.push("Obstacle detected");
             }
@@ -586,7 +586,9 @@
             pitchValue.textContent = `${pitch.toFixed(2)}°`;
 
             // Update other sensor values
-            lidarValue.innerHTML = `${data.sensors.lidar.toFixed(2)} <span class="unit">m</span>`;
+            // Convert lidar from centimeters to meters
+            const lidarInMeters = data.sensors.lidar / 100;
+            lidarValue.innerHTML = `${lidarInMeters.toFixed(2)} <span class="unit">m</span>`;
             lightValue.innerHTML = `${Math.round(data.sensors.light)} <span class="unit">lux</span>`;
             accelValue.innerHTML = `${data.sensors.accel_x.toFixed(2)} <span class="unit">m/s²</span>`;
 

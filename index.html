@@ -518,7 +518,9 @@
 
                     // Update other sensor values
                     if (latestData.sensors.lidar !== undefined) {
-                        lidarValue.innerHTML = `${latestData.sensors.lidar.toFixed(2)} <span class="unit">m</span>`;
+                        // Convert lidar from centimeters to meters
+                        const lidarInMeters = latestData.sensors.lidar / 100;
+                        lidarValue.innerHTML = `${lidarInMeters.toFixed(2)} <span class="unit">m</span>`;
                     }
                     if (latestData.sensors.light !== undefined) {
                         lightValue.innerHTML = `${Math.round(latestData.sensors.light)} <span class="unit">lux</span>`;

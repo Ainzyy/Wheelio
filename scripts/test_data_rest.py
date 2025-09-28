@@ -21,7 +21,7 @@ def generate_sensor_data():
     tilt_fb = random.uniform(-15, 15)    # Front/back tilt (pitch) -15 to +15 degrees
     
     # Generate other sensor values
-    lidar = random.uniform(0.5, 5.0)     # Lidar distance 0.5 to 5.0 meters
+    lidar = random.uniform(50, 500)      # Lidar distance 50 to 500 centimeters
     light = random.uniform(0, 2000)      # Light sensor 0 to 2000 lux
     accel_x = random.uniform(-10, 10)    # Acceleration -10 to +10 m/s²
     
@@ -29,7 +29,7 @@ def generate_sensor_data():
         "sensors": {
             "tilt_side": round(tilt_side, 5),
             "tilt_fb": round(tilt_fb, 5),
-            "lidar": round(lidar, 5),
+            "lidar": round(lidar, 1),        # Round to 1 decimal for centimeters
             "light": round(light, 5),
             "accel_x": round(accel_x, 5)
         },
@@ -75,8 +75,8 @@ def calculate_actuators_and_warnings(sensor_data):
         warning_light = True
         warnings.append("High acceleration warning")
     
-    # Check lidar distance
-    if sensors["lidar"] <= 1.50:
+    # Check lidar distance (lidar now in centimeters)
+    if sensors["lidar"] <= 150:  # 150 cm = 1.50 meters
         warning_light = True
         warnings.append("Obstacle detected")
     
@@ -121,13 +121,13 @@ def upload_to_firebase(data):
         return False, str(e)
 
 def create_test_scenarios():
-    """Create specific test scenarios to demonstrate different conditions"""
+    """Create specific test scenarios to demonstrate different conditions (lidar in centimeters)"""
     scenarios = [
         # Normal operation
         {
             "tilt_side": 5.0,
             "tilt_fb": 2.0,
-            "lidar": 3.0,
+            "lidar": 300.0,  # 3.0 meters in centimeters
             "light": 1500,
             "accel_x": 1.2
         },
@@ -135,7 +135,7 @@ def create_test_scenarios():
         {
             "tilt_side": 35.0,
             "tilt_fb": 3.0,
-            "lidar": 2.5,
+            "lidar": 250.0,  # 2.5 meters in centimeters
             "light": 1200,
             "accel_x": 2.1
         },
@@ -143,7 +143,7 @@ def create_test_scenarios():
         {
             "tilt_side": 8.0,
             "tilt_fb": 12.0,
-            "lidar": 2.0,
+            "lidar": 200.0,  # 2.0 meters in centimeters
             "light": 1100,
             "accel_x": 3.5
         },
@@ -151,7 +151,7 @@ def create_test_scenarios():
         {
             "tilt_side": 5.0,
             "tilt_fb": 3.0,
-            "lidar": 1.2,
+            "lidar": 120.0,  # 1.2 meters in centimeters
             "light": 1300,
             "accel_x": 0.8
         },
@@ -159,7 +159,7 @@ def create_test_scenarios():
         {
             "tilt_side": 2.0,
             "tilt_fb": 1.0,
-            "lidar": 2.8,
+            "lidar": 280.0,  # 2.8 meters in centimeters
             "light": 800,
             "accel_x": 1.0
         },
@@ -167,7 +167,7 @@ def create_test_scenarios():
         {
             "tilt_side": 5.0,
             "tilt_fb": 3.0,
-            "lidar": 2.5,
+            "lidar": 250.0,  # 2.5 meters in centimeters
             "light": 1200,
             "accel_x": 3.5
         },
@@ -175,7 +175,7 @@ def create_test_scenarios():
         {
             "tilt_side": 40.0,
             "tilt_fb": 11.0,
-            "lidar": 1.0,
+            "lidar": 100.0,  # 1.0 meter in centimeters
             "light": 500,
             "accel_x": 8.5
         }

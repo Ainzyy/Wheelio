@@ -463,7 +463,7 @@
         // 
         // Automatic features (not warnings):
         // - Light < 1000 lux: Fog Light (visibility aid for bicycle)
-        const dataRef = database.ref('test_data1');
+        const dataRef = database.ref('sensor_readings_test2');
 
         dataRef.on('value', (snapshot) => {
             const rawData = snapshot.val();

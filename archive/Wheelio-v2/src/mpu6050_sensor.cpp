@@ -10,7 +10,11 @@ static const float alpha = 0.2f;
 
 void mpu6050Init() {
   Wire.begin(PIN_MPU_SDA, PIN_MPU_SCL);
-  mpu.begin();
+  if (!mpu.begin()) {
+    Serial.println("Failed to initialize MPU6050 sensor");
+    return;
+  }
+  Serial.println("MPU6050 initialized successfully");
 }
 
 MpuData readMpuData() {

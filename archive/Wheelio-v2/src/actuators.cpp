@@ -11,13 +11,13 @@ void actuatorsInit() {
 }
 
 void setFogLight(bool on) {
-  digitalWrite(PIN_RELAY_FOG, on ? HIGH : LOW);
+  digitalWrite(PIN_RELAY_FOG, on ? LOW : HIGH);  // Active low relay
 }
 
 void setWarningLight(bool on) {
-  digitalWrite(PIN_RELAY_WARN, on ? HIGH : LOW);
+  digitalWrite(PIN_RELAY_WARN, on ? LOW : HIGH);  // Active low relay
 }
 
 void setBuzzer(bool on) {
-  digitalWrite(PIN_BUZZER, on ? HIGH : LOW);
+  digitalWrite(PIN_BUZZER, on ? HIGH : LOW);  // Active high buzzer
 }

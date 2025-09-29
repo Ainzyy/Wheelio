@@ -1,21 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <cstdlib> // For getenv
-#include <fstream>
-#include <map>
-#include <string>
-
-// Declare the env variable
-extern std::map<std::string, std::string> env;
-
-// Declare the parseEnvFile function
-std::map<std::string, std::string> parseEnvFile(const std::string &filePath);
-
-// Function to load the .env file
-void loadEnv();
-
-// Pin assignments
+// --- Pin Assignments ---
 #define PIN_LIGHT_SENSOR 33
 #define PIN_MPU_SDA 21
 #define PIN_MPU_SCL 22
@@ -25,36 +11,31 @@ void loadEnv();
 #define PIN_RELAY_WARN 17
 #define PIN_BUZZER 5
 
-// Thresholds
-#define TILT_SIDE_THRESHOLD 30.0f // degrees
-#define TILT_FB_THRESHOLD 9.0f    // degrees
-#define ACCEL_THRESHOLD 2.0f      // m/s^2
-#define DIST_THRESHOLD 120        // cm
-#define LIGHT_THRESHOLD 1000      // lumens (calibrated)
+// --- Thresholds ---
+extern float TILT_SIDE_THRESHOLD;
+extern float TILT_FB_THRESHOLD;
+extern float DIST_THRESHOLD;
+extern float LIGHT_THRESHOLD;
 
-// Calibration (example values, adjust as needed)
-#define LIGHT_CALIB_A 1.0f
-#define LIGHT_CALIB_B 0.0f
-
-// Debug mode
+// --- Debug Mode ---
 #define DEBUG_MODE true
 
-// WiFiManager
+// --- WiFiManager ---
 #define WIFI_AP_NAME "Wheelio-Setup"
 #define WIFI_AP_PASSWORD ""
 
-// Firebase
+// --- Firebase ---
 #define API_KEY "AIzaSyDg9Le8N-x1v30_ArHJWQGoEIoNdUXStjI"
-// Firebase Account
 #define EMAIL "wheelioooh@gmail.com"
 #define PASSWORD "wheelioGroup?!"
-#define FIREBASE_HOST "https://wheelio-0o-default-rtdb.asia-southeast1.firebasedatabase.app/"
+#define FIREBASE_HOST                                                          \
+  "https://wheelio-0o-default-rtdb.asia-southeast1.firebasedatabase.app/"
 #define FIREBASE_AUTH ""
 #define FIREBASE_SENSOR_PATH "/sensor_readings"
 
-// NTP
-#define NTP_SERVER "pool.ntp.org"
-#define GMT_OFFSET_SEC 28800 // GMT+8
-#define DAYLIGHT_OFFSET_SEC 0
+// --- EMA Filter Sensitivity ---
+#define EMA_ALPHA_LIGHT 0.2f // Sensitivity for light sensor
+#define EMA_ALPHA_LIDAR 0.15f // Sensitivity for lidar sensor
+#define EMA_ALPHA_MPU 0.35f   // Sensitivity for MPU6050 sensor
 
 #endif // CONFIG_H

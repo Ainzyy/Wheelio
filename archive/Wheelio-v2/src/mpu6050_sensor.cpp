@@ -1,11 +1,11 @@
 #include "mpu6050_sensor.h"
 #include "config.h"
-#include <Wire.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
+#include <Wire.h>
 
 static Adafruit_MPU6050 mpu;
-static MpuData prevData = {0,0,0,0,0};
+static MpuData prevData = {0, 0, 0, 0, 0};
 static const float alpha = 0.2f;
 
 void mpu6050Init() {

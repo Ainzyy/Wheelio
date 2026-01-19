@@ -1,0 +1,5 @@
+adafruit/Adafruit MPU6050@^2.2.6
+arduino-libraries/NTPClient@^3.2.1
+tzapu/WiFiManager@^2.0.15
+"Adafruit VL53L0X"
+https://github.com/mobizt/Firebase-ESP-Client.git

@@ -100,17 +100,30 @@ void loop()
   }
 
   // Use smoothed values for logic
-  bool fogOn = lumensSmooth < LIGHT_THRESHOLD;
-  setFogLight(fogOn);
-
   bool warnLidar = (distanceSmooth > 0 && distanceSmooth < DIST_THRESHOLD);
   bool warnAccel = fabs(accelXSmooth) > ACCEL_THRESHOLD;
   bool warnTiltSide = fabs(tiltSideSmooth) > TILT_SIDE_THRESHOLD;
   bool warnTiltFB = fabs(tiltFBSmooth) > TILT_FB_THRESHOLD;
   bool warnMpu = warnAccel || warnTiltSide || warnTiltFB;
-  bool warning = warnLidar || warnMpu;
-  setWarningLight(warning);
-  setBuzzer(warnMpu); // Only buzzer for MPU events
+  bool alert = warnLidar || warnMpu;
+
+  // Relay 16: LED strip 1 ON only when lumens < threshold
+  bool fogOn = lumensSmooth < LIGHT_THRESHOLD;
+  setFogLight(fogOn);
+  if (DEBUG_MODE)
+  {
+    Serial.print("[Relay] LED Strip 1 (pin 16): ");
+    Serial.println(fogOn ? "ON" : "OFF");
+  }
+
+  // Relay 17: LED strip 2 + buzzer ON only when alert is active
+  setWarningLight(alert);
+  setBuzzer(alert);
+  if (DEBUG_MODE)
+  {
+    Serial.print("[Relay] LED Strip 2 + Buzzer (pin 17): ");
+    Serial.println(alert ? "ON" : "OFF");
+  }
 
   // Non-blocking upload/print every 1 second
   static unsigned long lastUpload = 0;
@@ -135,34 +148,33 @@ void loop()
     json.set("tiltSide", tiltSideSmooth);
     json.set("tiltFB", tiltFBSmooth);
     json.set("fogOn", fogOn);
-    json.set("warning", warning);
+    json.set("warning", alert);
     json.set("buzzer", warnMpu);
     json.set("timestamp", timestamp);
+    if (DEBUG_MODE)
+    {
+      Serial.print("[DEBUG] WiFi status (loop): ");
+      Serial.println(WiFi.status() == WL_CONNECTED ? "Connected" : "Not Connected");
+      Serial.print("[DEBUG] Firebase ready: ");
+      Serial.println(Firebase.ready() ? "Yes" : "No");
+    }
     if (Firebase.ready())
     {
-      if (Firebase.setJSON(fbdo, path.c_str(), json)) {
-        if (DEBUG_MODE) Serial.println("[Firebase] Data upload successful.");
-      } else {
-        Serial.print("[Firebase] Upload failed: ");
-        Serial.println(fbdo.errorReason());
+      bool fbResult = Firebase.setJSON(fbdo, path.c_str(), json);
+      if (DEBUG_MODE)
+      {
+        Serial.print("[DEBUG] Firebase upload status: ");
+        Serial.println(fbResult ? "Success" : "Failed");
+        if (!fbResult)
+        {
+          Serial.print("[DEBUG] Firebase error: ");
+          Serial.println(fbdo.errorReason());
+        }
       }
     }
-
-    // Example: Read back the last uploaded data (optional)
-    String readPath = path; // Use the same timestamped path
-    if (Firebase.ready()) {
-      if (Firebase.getJSON(fbdo, readPath.c_str())) {
-        FirebaseJson &result = fbdo.jsonObject();
-        String jsonStr;
-        result.toString(jsonStr, true);
-        if (DEBUG_MODE) {
-          Serial.println("[Firebase] Read back data:");
-          Serial.println(jsonStr);
-        }
-      } else {
-        Serial.print("[Firebase] Read failed: ");
-        Serial.println(fbdo.errorReason());
-      }
+    else if (DEBUG_MODE)
+    {
+      Serial.println("[DEBUG] Firebase not ready (upload skipped)");
     }
 
     // Debug output
@@ -181,7 +193,7 @@ void loop()
       Serial.print(" | Fog: ");
       Serial.print(fogOn);
       Serial.print(" | Warn: ");
-      Serial.print(warning);
+      Serial.print(alert);
       Serial.print(" | Buzzer: ");
       Serial.print(warnMpu);
       Serial.print(" | Time: ");

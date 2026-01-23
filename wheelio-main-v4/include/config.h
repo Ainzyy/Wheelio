@@ -3,13 +3,13 @@
 
 // --- Hardware Activation Flags ---
 // Set to 1 to enable, 0 to disable for targeted debugging
-#define ENABLE_LIDAR 0
-#define ENABLE_IMU 0
-#define ENABLE_LIGHT_SENSOR 0
-#define ENABLE_FOG_LIGHT 0    // Fog relay
-#define ENABLE_WARNING_SYSTEM 0 // Warning relay and buzzer
+#define ENABLE_LIDAR 1
+#define ENABLE_IMU 1
+#define ENABLE_LIGHT_SENSOR 1
+#define ENABLE_FOG_LIGHT 1    // Fog relay
+#define ENABLE_WARNING_SYSTEM 1 // Warning relay and buzzer
 #define ENABLE_DEBUG_SERIAL 1
-#define ENABLE_MOCK_DATA 1 // Set to 1 to simulate sensor data
+#define ENABLE_MOCK_DATA 0 // Set to 1 to simulate sensor data
 
 // --- Pin mappings ---
 // I2C Shared Pins

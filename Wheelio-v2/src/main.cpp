@@ -140,7 +140,29 @@ void loop()
     json.set("timestamp", timestamp);
     if (Firebase.ready())
     {
-      Firebase.setJSON(fbdo, path.c_str(), json);
+      if (Firebase.setJSON(fbdo, path.c_str(), json)) {
+        if (DEBUG_MODE) Serial.println("[Firebase] Data upload successful.");
+      } else {
+        Serial.print("[Firebase] Upload failed: ");
+        Serial.println(fbdo.errorReason());
+      }
+    }
+
+    // Example: Read back the last uploaded data (optional)
+    String readPath = path; // Use the same timestamped path
+    if (Firebase.ready()) {
+      if (Firebase.getJSON(fbdo, readPath.c_str())) {
+        FirebaseJson &result = fbdo.jsonObject();
+        String jsonStr;
+        result.toString(jsonStr, true);
+        if (DEBUG_MODE) {
+          Serial.println("[Firebase] Read back data:");
+          Serial.println(jsonStr);
+        }
+      } else {
+        Serial.print("[Firebase] Read failed: ");
+        Serial.println(fbdo.errorReason());
+      }
     }
 
     // Debug output

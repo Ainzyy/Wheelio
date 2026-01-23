@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wheelio Test Dashboard (Mock Data)</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* --- Basic Setup & Theming --- */
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg-color: #16213e;
+            --text-color: #e0e0e0;
+            --primary-color: #0f3460;
+            --accent-color: #e94560;
+            --active-glow: #52cffe;
+            --warning-glow: #e94560;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- Main Layout --- */
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header h1 .fa-flask {
+            color: #ffcc00;
+            font-size: 1.2em;
+        }
+
+        #last-updated {
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- Card Styling --- */
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            text-align: center;
+            color: white;
+        }
+
+        /* --- Actuator Component Styling --- */
+        .actuators-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
+        }
+
+        .actuator-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actuator-item .icon {
+            font-size: 2.5em;
+            color: #4a5578;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .actuator-item.active .icon-buzzer { color: var(--warning-glow); text-shadow: 0 0 15px var(--warning-glow); }
+        .actuator-item.active .icon-warning { color: var(--warning-glow); text-shadow: 0 0 15px var(--warning-glow); }
+        .actuator-item.active .icon-fog { color: var(--active-glow); text-shadow: 0 0 15px var(--active-glow); }
+        
+        .actuator-item span {
+            font-weight: 500;
+        }
+
+        /* --- Sensor Value Component Styling --- */
+        .sensor-value {
+            font-size: 2.8em;
+            font-weight: 700;
+            text-align: center;
+            margin: auto 0;
+            color: white;
+        }
+        .sensor-value .unit {
+            font-size: 0.5em;
+            font-weight: 400;
+            color: var(--text-color);
+        }
+
+        /* --- Inclination (Tilt) Component Styling --- */
+        .tilt-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .bicycle-visualizer {
+            width: 150px;
+            height: 150px;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, var(--bg-color) 0%, var(--card-bg-color) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bike-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: 
+                invert(1) 
+                sepia(1) 
+                saturate(3) 
+                hue-rotate(190deg) 
+                brightness(1.1) 
+                contrast(1.3) 
+                drop-shadow(0 0 15px var(--active-glow));
+            z-index: 2;
+            position: relative;
+        }
+
+        .reference-line {
+            position: absolute;
+            background-color: var(--active-glow);
+            opacity: 0.6;
+            z-index: 1;
+        }
+
+        .horizontal-line {
+            width: 120px;
+            height: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .vertical-line {
+            width: 2px;
+            height: 120px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .tilt-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .direction-label {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: var(--active-glow);
+            opacity: 0.8;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            white-space: nowrap;
+        }
+
+        .tilt-value {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        /* --- Warning Message Styling --- */
+        #warning-card {
+            grid-column: 1 / -1; 
+            border-color: transparent;
+            background-color: transparent;
+            text-align: center;
+            min-height: 50px;
+            justify-content: center;
+            transition: background-color 0.5s ease;
+        }
+        
+        #warning-card.has-warning {
+             background-color: #5d1c28;
+             border-color: var(--accent-color);
+        }
+
+        #warning-message {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: white;
+            margin: 0;
+        }
+
+        #warning-message i {
+            margin-right: 10px;
+        }
+
+        #warning-message .fa-check-circle { color: #52cffe; }
+        #warning-message .fa-exclamation-triangle { color: var(--accent-color); }
+
+        /* --- Mode Switch Button --- */
+        .mode-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: var(--active-glow);
+            border: 1px solid var(--active-glow);
+            border-radius: 25px;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mode-button:hover {
+            background-color: var(--active-glow);
+            color: var(--bg-color);
+            transform: translateY(-2px);
+        }
+
+        .badge-mock {
+            background-color: #ffcc00;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Back to Live Button -->
+    <a href="wheelio-dashboard.html" class="mode-button" title="Switch to Live Firebase Data">
+        <i class="fas fa-satellite-dish"></i>
+        Go Live
+    </a>
+
+    <div class="dashboard-container">
+        <header>
+            <h1><i class="fas fa-flask"></i> Wheelio Dashboard <span class="badge-mock">MOCK MODE</span></h1>
+            <p id="last-updated">Simulator starting...</p>
+        </header>
+
+        <div class="grid-container">
+            <!-- Actuators Card -->
+            <div class="card">
+                <h3 class="card-title">Actuator Status</h3>
+                <div class="actuators-container">
+                    <div id="buzzer-status" class="actuator-item">
+                        <i class="fas fa-bell icon icon-buzzer"></i>
+                        <span>Buzzer</span>
+                    </div>
+                    <div id="warning-light-status" class="actuator-item">
+                        <i class="fas fa-lightbulb icon icon-warning"></i>
+                        <span>Warning Light</span>
+                    </div>
+                    <div id="fog-light-status" class="actuator-item">
+                        <i class="fas fa-cloud-sun icon icon-fog"></i>
+                        <span>Fog Light</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side to Side Tilt (Roll) -->
+            <div class="card">
+                <h3 class="card-title">Side Tilt (Roll)</h3>
+                <div class="tilt-display">
+                    <div class="tilt-container">
+                        <div class="direction-label">LEFT</div>
+                        <div class="bicycle-visualizer">
+                            <div class="reference-line vertical-line"></div>
+                            <img id="roll-bicycle" src="bike-front.png" alt="Bike Front View" class="bike-image">
+                        </div>
+                        <div class="direction-label">RIGHT</div>
+                    </div>
+                    <div id="roll-value" class="tilt-value">0.0°</div>
+                </div>
+            </div>
+
+            <!-- Front/Back Tilt (Pitch) -->
+            <div class="card">
+                <h3 class="card-title">Front/Back Tilt (Pitch)</h3>
+                <div class="tilt-display">
+                    <div class="tilt-container">
+                        <div class="direction-label">BACK</div>
+                        <div class="bicycle-visualizer">
+                            <div class="reference-line horizontal-line"></div>
+                            <img id="pitch-bicycle" src="bike-side.png" alt="Bike Side View" class="bike-image">
+                        </div>
+                        <div class="direction-label">FRONT</div>
+                    </div>
+                    <div id="pitch-value" class="tilt-value">0.0°</div>
+                </div>
+            </div>
+            
+            <!-- Other Sensors -->
+            <div class="card">
+                <h3 class="card-title">Lidar Distance</h3>
+                <p id="lidar-value" class="sensor-value">0 <span class="unit">cm</span></p>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Ambient Light</h3>
+                <p id="light-value" class="sensor-value">0 <span class="unit">lux</span></p>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Acceleration (X)</h3>
+                <p id="accel-value" class="sensor-value">0.00 <span class="unit">m/s²</span></p>
+            </div>
+            
+            <!-- Warning Message -->
+            <div id="warning-card" class="card">
+                <p id="warning-message"><i class="fas fa-check-circle"></i> Simulator active.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Element References
+        const lastUpdatedEl = document.getElementById('last-updated');
+        const buzzerStatus = document.getElementById('buzzer-status');
+        const warningLightStatus = document.getElementById('warning-light-status');
+        const fogLightStatus = document.getElementById('fog-light-status');
+        const rollBicycle = document.getElementById('roll-bicycle');
+        const rollValue = document.getElementById('roll-value');
+        const pitchBicycle = document.getElementById('pitch-bicycle');
+        const pitchValue = document.getElementById('pitch-value');
+        const lidarValue = document.getElementById('lidar-value');
+        const lightValue = document.getElementById('light-value');
+        const accelValue = document.getElementById('accel-value');
+        const warningCard = document.getElementById('warning-card');
+        const warningMessage = document.getElementById('warning-message');
+
+        /**
+         * Generates a formatted timestamp YYYY-MM-DD HH:MM:SS
+         */
+        function getFormattedTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        /**
+         * Main Simulator Function
+         * Generates random data matching our custom ESP32 structure
+         */
+        function updateMockData() {
+            // 1. Generate Random Values
+            // Side tilt: -40 to 40
+            const tilt_side = (Math.random() * 80) - 40;
+            // Front tilt: -15 to 15
+            const tilt_fb = (Math.random() * 30) - 15;
+            // Lidar: 20cm to 400cm
+            const distance_cm = Math.floor(Math.random() * 380) + 20;
+            // Light: 50lx to 3000lx
+            const light_level = Math.floor(Math.random() * 2950) + 50;
+            // Acceleration: 0.5 to 3.5 m/s2
+            const acceleration = (Math.random() * 3) + 0.5;
+            
+            // 2. Determine States based on Wheelio logic
+            const fog_active = (light_level < 1000);
+            
+            let warning_active = false;
+            let reason = "System nominal.";
+
+            if (Math.abs(tilt_side) > 30) {
+                warning_active = true;
+                reason = "Extreme Side Tilt!";
+            } else if (Math.abs(tilt_fb) > 9) {
+                warning_active = true;
+                reason = "Extreme Pitch Angle!";
+            } else if (acceleration >= 2.0) {
+                warning_active = true;
+                reason = "High G-Force!";
+            } else if (distance_cm <= 150) {
+                warning_active = true;
+                reason = "Obstacle Detected!";
+            }
+
+            // 3. Update UI
+            
+            // Actuators
+            buzzerStatus.classList.toggle('active', warning_active);
+            warningLightStatus.classList.toggle('active', warning_active);
+            fogLightStatus.classList.toggle('active', fog_active);
+
+            // Tilt
+            rollBicycle.style.transform = `rotate(${Math.max(-45, Math.min(45, tilt_side))}deg)`;
+            rollValue.textContent = `${tilt_side.toFixed(1)}°`;
+            
+            pitchBicycle.style.transform = `rotate(${Math.max(-45, Math.min(45, tilt_fb))}deg)`;
+            pitchValue.textContent = `${tilt_fb.toFixed(1)}°`;
+
+            // Numeric Displays
+            lidarValue.innerHTML = `${distance_cm} <span class="unit">cm</span>`;
+            lightValue.innerHTML = `${light_level} <span class="unit">lux</span>`;
+            accelValue.innerHTML = `${acceleration.toFixed(2)} <span class="unit">m/s²</span>`;
+
+            // Warning Banner
+            if (warning_active) {
+                warningMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${reason}`;
+                warningCard.classList.add('has-warning');
+            } else {
+                warningMessage.innerHTML = '<i class="fas fa-check-circle"></i> System nominal. All clear.';
+                warningCard.classList.remove('has-warning');
+            }
+
+            // Metadata
+            const timestamp = getFormattedTime();
+            lastUpdatedEl.textContent = `Mock Data Updated: ${timestamp} (Simulating ESP32)`;
+            
+            console.log("Mock data tick:", { 
+                dist: distance_cm, 
+                side: tilt_side.toFixed(1), 
+                fb: tilt_fb.toFixed(1),
+                warn: warning_active 
+            });
+        }
+
+        // Start the loop: Every 5 seconds
+        updateMockData(); // Initial run
+        setInterval(updateMockData, 5000);
+
+    </script>
+</body>
+</html>
